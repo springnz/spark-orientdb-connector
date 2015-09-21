@@ -47,6 +47,7 @@ object SparkContextUtils {
     .set("spark.orientdb.dbname", dbname)
     .set("spark.orientdb.user", user)
     .set("spark.orientdb.password", pass)
+    .set("spark.orientdb.clustermode", "colocated")
 
   private var _sparkContex: SparkContext = _
 
