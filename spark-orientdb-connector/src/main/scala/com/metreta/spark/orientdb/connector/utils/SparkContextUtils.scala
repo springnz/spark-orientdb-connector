@@ -33,7 +33,7 @@ object SparkContextUtils {
   val protocol = "plocal" //"memory"
   val user = "admin"
   val pass = "admin"
-  val dbname = "temp/databases/test/orientdb"
+  val dbname = "/tmp/databases/test/orientdb"
 
   /**
    * Default [[org.apache.spark.SparkContext]] configuration.
