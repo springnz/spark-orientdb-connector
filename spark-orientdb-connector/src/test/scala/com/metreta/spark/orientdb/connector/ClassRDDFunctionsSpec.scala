@@ -60,7 +60,7 @@ class ClassRDDFunctionsSpec extends BaseOrientDbFlatSpec {
   var database: ODatabaseDocumentTx = null
 
   //sparkContext.orientQuery("class_ins_test").foreach(println)
-
+  
   override def beforeAll(): Unit = {
     initSparkConf(defaultSparkConf)
 

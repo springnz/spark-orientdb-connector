@@ -28,7 +28,7 @@ import java.math.BigDecimal
 import com.metreta.spark.orientdb.connector.utils.BaseOrientDbFlatSpec
 
 class ClassRDDSpec extends BaseOrientDbFlatSpec {
-
+  
   var NumInsertLoop = 250
   var NumStringField = 5
   var AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"

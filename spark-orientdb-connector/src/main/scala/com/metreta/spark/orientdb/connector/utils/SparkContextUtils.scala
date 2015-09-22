@@ -30,7 +30,7 @@ trait SparkContextUtils {
 
 object SparkContextUtils {
 
-  val protocol = "plocal" //"memory"
+  val protocol = "memory" // "plocal"
   val user = "admin"
   val pass = "admin"
   val dbname = "/tmp/databases/test/orientdb"

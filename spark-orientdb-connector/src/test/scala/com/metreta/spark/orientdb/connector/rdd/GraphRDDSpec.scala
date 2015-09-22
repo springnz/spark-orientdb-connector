@@ -29,7 +29,7 @@ import org.apache.spark.graphx.Edge
 import com.metreta.spark.orientdb.connector.utils.BaseOrientDbFlatSpec
 
 class GraphRDDSpec extends BaseOrientDbFlatSpec {
-
+  
   override def beforeAll(): Unit = {
     initSparkConf(defaultSparkConf)
     buildTestDb

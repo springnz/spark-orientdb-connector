@@ -75,7 +75,7 @@ class GraphFunctionsSpec extends BaseOrientDbFlatSpec {
   calendarDate.set(Calendar.MILLISECOND, 0)
 
   var graphDb: OrientGraphNoTx = null
-
+  
   override def beforeAll(): Unit = {
     initSparkConf(defaultSparkConf)
     graphDb = createDB
