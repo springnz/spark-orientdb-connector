@@ -5,6 +5,7 @@ package com.metreta.spark.orientdb.connector.rdd
 
 import scala.collection.JavaConversions._
 import java.util.Date
+import java.util.Calendar
 
 abstract class OrientEntry(val className: String,
   val rid: String,

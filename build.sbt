@@ -3,11 +3,11 @@ lazy val commonSettings = Seq(
   version := "1.4-alpha-1",
   scalaVersion := "2.11.7",
   libraryDependencies ++= Seq(
-    "com.orientechnologies" % "orientdb-core" % "2.1.0",
-    "com.orientechnologies" % "orientdb-client" % "2.1.0",
-    "com.orientechnologies" % "orientdb-jdbc" % "2.1.0",
-    "com.orientechnologies" % "orientdb-graphdb" % "2.1.0",
-    "com.orientechnologies" % "orientdb-distributed" % "2.1.0",
+    "com.orientechnologies" % "orientdb-core" % "2.0.15",
+    "com.orientechnologies" % "orientdb-client" % "2.0.15",
+    "com.orientechnologies" % "orientdb-jdbc" % "2.0.15",
+    "com.orientechnologies" % "orientdb-graphdb" % "2.0.15",
+    "com.orientechnologies" % "orientdb-distributed" % "2.0.15",
     "org.scalatest" % "scalatest_2.11" % "2.2.4",
     "org.apache.spark" % "spark-core_2.11" % "1.4.0",
     "org.apache.spark" % "spark-graphx_2.11" % "1.4.0",
@@ -18,7 +18,7 @@ lazy val commonSettings = Seq(
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.6.0"
     ),
     externalResolvers := Seq(DefaultMavenRepository),
-    fork in test := true
+    parallelExecution in Test := false
 )
 
 lazy val connector = (project in file("./spark-orientdb-connector")).

@@ -29,6 +29,8 @@ import com.metreta.spark.orientdb.connector.utils.BaseOrientDbFlatSpec
 
 class ClassRDDSpec extends BaseOrientDbFlatSpec {
   
+	val dbname = "/tmp/databases/test/ClassRDDSpec"
+			
   var NumInsertLoop = 250
   var NumStringField = 5
   var AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -43,6 +45,7 @@ class ClassRDDSpec extends BaseOrientDbFlatSpec {
   calendarDate.set(Calendar.MILLISECOND, 0)
 
   override def beforeAll(): Unit = {
+    defaultSparkConf.set("spark.orientdb.dbname", dbname)
     initSparkConf(defaultSparkConf)
     buildTestDb
   }
