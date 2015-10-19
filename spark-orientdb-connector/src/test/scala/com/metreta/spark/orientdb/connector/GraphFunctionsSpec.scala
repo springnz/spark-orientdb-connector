@@ -66,6 +66,8 @@ case class edgeProperties(byte_field: Byte,
   string_field: String)
 
 class GraphFunctionsSpec extends BaseOrientDbFlatSpec {
+  
+  val dbname = "/tmp/databases/test/GraphFunctionsSpec"
 
   val calendarDateTime = Calendar.getInstance()
   val calendarDate = Calendar.getInstance()
@@ -75,8 +77,9 @@ class GraphFunctionsSpec extends BaseOrientDbFlatSpec {
   calendarDate.set(Calendar.MILLISECOND, 0)
 
   var graphDb: OrientGraphNoTx = null
-
+  
   override def beforeAll(): Unit = {
+    defaultSparkConf.set("spark.orientdb.dbname", dbname)
     initSparkConf(defaultSparkConf)
     graphDb = createDB
 

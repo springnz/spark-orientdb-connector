@@ -48,6 +48,8 @@ case class ClassInsTest(
   string_field: String)
 
 class ClassRDDFunctionsSpec extends BaseOrientDbFlatSpec {
+  
+  val dbname = "/tmp/databases/test/ClassRDDFunctionsSpec"
 
   val calendarDateTime = Calendar.getInstance()
   val calendarDate = calendarDateTime
@@ -60,8 +62,9 @@ class ClassRDDFunctionsSpec extends BaseOrientDbFlatSpec {
   var database: ODatabaseDocumentTx = null
 
   //sparkContext.orientQuery("class_ins_test").foreach(println)
-
+  
   override def beforeAll(): Unit = {
+    defaultSparkConf.set("spark.orientdb.dbname", dbname)
     initSparkConf(defaultSparkConf)
 
     rddTest = createRDD

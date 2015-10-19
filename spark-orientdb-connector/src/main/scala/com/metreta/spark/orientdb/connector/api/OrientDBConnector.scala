@@ -22,6 +22,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLAsynchQuery
 import com.orientechnologies.orient.core.config.OGlobalConfiguration
 import com.sun.org.apache.bcel.internal.generic.RET
 import com.orientechnologies.orient.core.command.OCommandRequest
+import com.orientechnologies.orient.core.db.ODatabaseFactory
 
 /**
  * This is the connection manager, all OrientDB operations must be executed within this class.
@@ -72,7 +73,7 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
 
   val connStringRemote = connProtocol + ":" + connNodes.head.getHostAddress + ":" + connPort + "/" + connDbname
   val connStringLocalhost = connProtocol + ":" + "localhost:" + connPort + "/" + connDbname
-  val connStringLocal = "plocal" + ":/" + connDbname
+  val connStringLocal = connProtocol + ":/" + connDbname
 
   def connectDB(connString: String): OPartitionedDatabasePool = {
     val uri: String = connString
@@ -181,6 +182,12 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
         connectRandomDB()
     }
     dpool.acquire()
+    val pool: OPartitionedDatabasePool = if (clusterMode) {
+      connectDB(connStringLocalhost)
+    } else {
+      connectRandomDB()
+    }
+    pool.acquire()
   }
 
   /**
@@ -190,6 +197,11 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
   def databaseDocumentTxLocal(): ODatabaseDocumentTx = {
     new ODatabaseDocumentTx(connStringLocal)
   }
+
+  //  def databaseDocumentTxFromPoolLocal(): ODatabaseDocumentTx = {
+  //    val pool: OPartitionedDatabasePool = connectDB(connStringLocal)
+  //    pool.acquire()
+  //  }
 
   /**
    * Creates a new Transactional Graph using an existent database instance.

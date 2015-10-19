@@ -24,8 +24,8 @@ trait DemoUtils extends Logging {
   val OriendtDBPasswordProperty = "spark.orientdb.password"
   val DefaultOriendtDBPassword = "admin"
 
-  val OriendtDBClusterModeProperty = "spark.orientdb.clustermode" //remote-collocated
-  val DefaultOriendtDBClusterMode = "collocated"
+  val OriendtDBClusterModeProperty = "spark.orientdb.clustermode" //remote-colocated
+  val DefaultOriendtDBClusterMode = "colocated"
 
   implicit def toSparkContextFunctions(sc: SparkContext): SparkContextFunctions = new SparkContextFunctions(sc)
 

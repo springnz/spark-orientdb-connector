@@ -23,3 +23,5 @@ project/plugins/project/
 .cache-test
 .settings/*
 /.cache-tests
+spark-orientdb-connector-demos/.settings
+spark-orientdb-connector/.gitignore

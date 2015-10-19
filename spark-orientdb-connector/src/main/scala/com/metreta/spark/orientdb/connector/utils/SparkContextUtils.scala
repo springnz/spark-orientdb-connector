@@ -30,10 +30,10 @@ trait SparkContextUtils {
 
 object SparkContextUtils {
 
-  val protocol = "plocal" //"memory"
+  val protocol = "memory" // "plocal"
   val user = "admin"
   val pass = "admin"
-  val dbname = "temp/databases/test/orientdb"
+  val dbname = "/tmp/databases/test/orientdb"
 
   /**
    * Default [[org.apache.spark.SparkContext]] configuration.
@@ -47,6 +47,8 @@ object SparkContextUtils {
     .set("spark.orientdb.dbname", dbname)
     .set("spark.orientdb.user", user)
     .set("spark.orientdb.password", pass)
+    .set("spark.orientdb.clustermode", "colocated")
+    .set("spark.driver.allowMultipleContexts", "true")
 
   private var _sparkContex: SparkContext = _
 
