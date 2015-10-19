@@ -66,7 +66,7 @@ abstract class OrientEntry(val className: String,
     try {
       return columnValues.get((columnNames.zipWithIndex filter {
         case (columnName, i) => columnName.toLowerCase() == name.toLowerCase()
-      }).get(0)._2).asInstanceOf[String]
+      }).get(0)._2).toString
 
     } catch {
       case e1: IndexOutOfBoundsException =>

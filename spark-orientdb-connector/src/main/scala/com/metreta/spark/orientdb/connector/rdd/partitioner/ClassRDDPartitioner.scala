@@ -27,17 +27,13 @@ class ClassRDDPartitioner(
    * @return Spark partitions from a given OrientdDB class.
    */
   def getPartitions(): Array[Partition] = {
-
-    val db = connector.databaseDocumentTx()
+    
+	val db = connector.databaseDocumentTx()
 
     var partitions = new ArrayBuffer[OrientPartition]
-
     val schema: OSchema = connector.getSchema(db)
-
     var klass: OClass = schema.getClass(mClass)
-
     val storage: OStorage = connector.getStorage(db)
-
     //TODO: trovare matching corretto tra nodo/host e cluster
     // val delegateFieldValues = storage.asInstanceOf[OStorageRemoteThread].getClusterConfiguration.fieldValues()(0)
     // val nodesHost = delegateFieldValues.asInstanceOf[OTrackedList[ODocument]].map(z => (z.rawField("name"), z.rawField("listeners").asInstanceOf[OTrackedList[OTrackedMap[ODocument]]].get(0).get("listen")))
@@ -48,8 +44,7 @@ class ClassRDDPartitioner(
         null, // <- Host Address ?????
         PartitionName(klass.getName, storage.getClusterById(clusterId).getName)))
     }
-
-    partitions.toArray
+  partitions.toArray
   }
 
 }

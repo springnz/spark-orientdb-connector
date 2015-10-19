@@ -41,8 +41,8 @@ object OrientDBConnectorConf extends Logging {
   val DefaultOriendtDBClusterModeProperty = false
 
   def apply(conf: SparkConf): OrientDBConnectorConf = {
-    val nodesProperty = conf
-      .get(OrientDBNodesProperty, InetAddress.getLocalHost.getHostAddress)
+    
+    val nodesProperty = conf.get(OrientDBNodesProperty, InetAddress.getLocalHost.getHostAddress)
     val nodes = for {
       nodeName <- nodesProperty.split(",").toSet[String]
       nodeAddress <- getHost(nodeName)

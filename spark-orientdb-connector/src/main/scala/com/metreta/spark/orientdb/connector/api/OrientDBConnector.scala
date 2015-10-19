@@ -30,9 +30,6 @@ import com.orientechnologies.orient.core.db.ODatabaseFactory
 class OrientDBConnector(conf: OrientDBConnectorConf)
     extends Serializable with Logging {
 
-  var gpool: OPartitionedDatabasePool = null
-  var dpool: OPartitionedDatabasePool = null
-
   /**
    *  Specifies the storage type of the database to create. It can be one of the supported types:
    *  plocal - persistent database, the storage is written to the file system.
@@ -76,9 +73,8 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
   val connStringLocal = connProtocol + ":/" + connDbname
 
   def connectDB(connString: String): OPartitionedDatabasePool = {
-    val uri: String = connString
-    logInfo(s"Connection string: $uri")
-    new OPartitionedDatabasePool(uri, user, pass)
+    logInfo(s"Connection string: $connString")
+    new OPartitionedDatabasePool(connString, user, pass)
   }
 
   def connectRandomDB(): OPartitionedDatabasePool = {
@@ -149,7 +145,7 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
    * @param orientquery
    * @return the results list.
    */
-  def query(session: ODatabaseDocumentTx, orientquery: OSQLAsynchQuery[_]): OResultSet[Any] = { session.query(orientquery) }
+  def query(session: ODatabaseDocumentTx, orientquery: OSQLSynchQuery[_]): OResultSet[Any] = { session.query(orientquery) }
 
   /**
    * Executes a command against the database. A command can be a SQL statement or a Procedure
@@ -159,15 +155,15 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
   def executeCommand(session: ODatabaseDocumentTx, iCommand: OCommandSQL) = {
     session.command(iCommand).execute()
   }
-  
-    /**
+
+  /**
    * Executes a command against the database. A command can be a SQL statement or a Procedure
    * @param session
    * @param iCommand
    */
   def executeCommandWithReturn(session: ODatabaseDocumentTx, iCommand: OCommandRequest): Any = {
     session.command(iCommand).execute()
-    
+
   }
 
   /**
@@ -175,19 +171,11 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
    * @return an active database instance.
    */
   def databaseDocumentTx(): ODatabaseDocumentTx = {
-    if (dpool == null) {
-      dpool = if (clusterMode)
-        connectDB(connStringLocalhost)
-      else
-        connectRandomDB()
-    }
-    dpool.acquire()
-    val pool: OPartitionedDatabasePool = if (clusterMode) {
-      connectDB(connStringLocalhost)
-    } else {
-      connectRandomDB()
-    }
-    pool.acquire()
+     if (clusterMode)
+        new ODatabaseDocumentTx(connStringLocalhost).open(user, pass) 
+     else    
+      new ODatabaseDocumentTx(connProtocol + ":" + connNodes.toList((math.random * connNodes.size).toInt).getHostAddress + ":" + connPort + "/" + connDbname).open(user, pass) 
+    
   }
 
   /**
@@ -208,14 +196,8 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
    * @return an active graph database instance.
    */
   def databaseGraphTx(): OrientGraph = {
-    if (gpool == null) {
-      OGlobalConfiguration.RID_BAG_EMBEDDED_TO_SBTREEBONSAI_THRESHOLD.setValue(-1);
-      gpool = if (clusterMode)
-        connectDB(connStringLocalhost)
-      else
-        connectRandomDB()
-    }
-    new OrientGraph(gpool.acquire());
+    OGlobalConfiguration.RID_BAG_EMBEDDED_TO_SBTREEBONSAI_THRESHOLD.setValue(-1);
+    new OrientGraph(pool().acquire());
   }
 
   /**
@@ -234,15 +216,23 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
   def databaseGraphTxLocal(): OrientGraph = {
     new OrientGraph(connStringLocal, user, pass);
   }
+  /**
+   * Creates a new connection pool to the database.
+   * @return a connection pool.
+   */
+  def pool(): OPartitionedDatabasePool = {
+    if (clusterMode)
+      connectDB(connStringLocalhost)
+    else
+      connectRandomDB()
+  }
 
 }
 
 object OrientDBConnector {
-  var connector: OrientDBConnector = null;
+
   def apply(conf: SparkConf): OrientDBConnector = {
-    if (connector == null)
-      connector = new OrientDBConnector(OrientDBConnectorConf(conf))
-    connector
+    new OrientDBConnector(OrientDBConnectorConf(conf))
   }
 
 }

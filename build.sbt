@@ -1,8 +1,9 @@
 lazy val commonSettings = Seq(
   organization := "com.metreta",
   version := "1.4-alpha-1",
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.10.4",
   libraryDependencies ++= Seq(
+<<<<<<< Updated upstream
     "com.orientechnologies" % "orientdb-core" % "2.0.15",
     "com.orientechnologies" % "orientdb-client" % "2.0.15",
     "com.orientechnologies" % "orientdb-jdbc" % "2.0.15",
@@ -19,6 +20,18 @@ lazy val commonSettings = Seq(
     ),
     externalResolvers := Seq(DefaultMavenRepository),
     parallelExecution in Test := false
+=======
+    "com.orientechnologies" % "orientdb-core" % "2.1.0",
+    "com.orientechnologies" % "orientdb-client" % "2.1.0",
+    "com.orientechnologies" % "orientdb-jdbc" % "2.1.0",
+    "org.apache.spark" % "spark-core_2.10" % "1.5.1",
+    "org.scalatest" % "scalatest_2.10" % "2.2.4",
+    "org.apache.spark" % "spark-graphx_2.10" % "1.5.1",
+    "com.tinkerpop.blueprints" % "blueprints-core" % "2.6.0",
+    "com.orientechnologies" % "orientdb-graphdb" % "2.1.0",
+    "com.orientechnologies" % "orientdb-distributed" % "2.1.0"
+    )
+>>>>>>> Stashed changes
 )
 
 lazy val connector = (project in file("./spark-orientdb-connector")).

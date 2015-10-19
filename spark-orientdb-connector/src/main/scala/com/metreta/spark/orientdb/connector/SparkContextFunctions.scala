@@ -26,8 +26,10 @@ import com.orientechnologies.orient.core.sql.query.OSQLAsynchQuery
 import com.orientechnologies.orient.core.sql.query.OResultSet
 import com.orientechnologies.orient.core.intent.OIntentMassiveInsert
 import com.orientechnologies.common.exception.OException
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery
+import org.apache.spark.Logging
 
-class SparkContextFunctions(@transient val sc: SparkContext) extends Serializable {
+class SparkContextFunctions(@transient val sc: SparkContext) extends Serializable with Logging{
 
   val out: Int = 0
   val in: Int = 1
@@ -128,7 +130,6 @@ class SparkContextFunctions(@transient val sc: SparkContext) extends Serializabl
    */
   def orientSQLStatement(sqlStatement: String)(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)): Unit = {
     val session = connector.databaseDocumentTx()
-    //    var res: OResultSet[Any] = null
     try {
       connector.executeCommand(session, new OCommandSQL(sqlStatement))
       session.commit()
@@ -137,28 +138,8 @@ class SparkContextFunctions(@transient val sc: SparkContext) extends Serializabl
     } finally {
       session.close()
     }
-    //res
   }
-  
-//  /**
-//   * Executes a single SQL statement on OrientDB
-//   * @param sqlStatement
-//   *
-//   */
-//  def orientSQLStatementWithReturn(sqlStatement: String)(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)) : OResultSet[Any] = {
-//    val session = connector.databaseDocumentTx()
-//    var res: OResultSet[Any] = null
-//    try {
-//      val c = connector.executeCommandWithReturn(session, new OCommandSQL(sqlStatement))
-//      session.commit()
-//    } catch {
-//      case e: Exception => session.rollback()
-//    } finally {
-//      session.close()
-//    }
-//    res
-//  }
-  
+
   /**
    * Executes a single SQL statement on OrientDB
    * @param sqlStatement
@@ -166,6 +147,7 @@ class SparkContextFunctions(@transient val sc: SparkContext) extends Serializabl
    */
 
   def list(sqlStatement: String)(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)): java.util.ArrayList[Any] = {
+
     val session = connector.databaseDocumentTx()
     var res: java.util.ArrayList[Any] = null
     try {
@@ -178,71 +160,6 @@ class SparkContextFunctions(@transient val sc: SparkContext) extends Serializabl
     }
     res
   }
-
-//  /**
-//   * Executes a single SQL query on OrientDB
-//   * @param sqlStatement
-//   * @return the results list.
-//   *
-//   */
-//  def orientSQLQuery(sqlStatement: String)(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)): OResultSet[Any] = {
-//    val session = connector.databaseDocumentTx()
-//    var res: OResultSet[Any] = null
-//    try {
-//      res = connector.query(session, new OSQLAsynchQuery(sqlStatement))
-////      println("res: ")
-////      res.foreach { println }
-//      session.commit()
-//    } catch {
-//      case e: Exception => session.rollback()
-//    } finally {
-//      session.close()
-//    }
-//    res
-//  }
-//
-//  def addEdgeOld(myClass: String, propFrom: String, propTo: String, valFrom: Any, valTo: Any)(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)) {
-//    val t0 = System.currentTimeMillis()
-//    val session = connector.databaseGraphTx()
-//    session.getRawGraph().declareIntent(new OIntentMassiveInsert());
-//    session.getRawGraph().getTransaction().setUsingLog(false);
-//    val fromList = session.getVertices(propFrom, valFrom).toList
-//    val toList = session.getVertices(propTo, valTo).toList
-//    if (fromList.length > 0 && toList.length > 0) {
-//      val from = fromList.get(0).asInstanceOf[OrientVertex]
-//      val to = toList.get(0).asInstanceOf[OrientVertex]
-//      var retry = 0
-//      var done = false
-//      try {
-//        while (retry < 100 && !done) {
-//          retry = retry + 1
-//          try {
-//            session.addEdge(s"class:$myClass", from, to, null)
-//            session.makeActive()
-//            connector.commit(session)
-//            done = true
-//            //            session.shutdown()
-//          } catch {
-//            case e: OConcurrentModificationException =>
-//              from.reload()
-//              to.reload()
-//          }
-//        }
-//      } catch {
-//        case e: OException =>
-//          session.rollback()
-//      } finally {
-//        session.shutdown()
-//      }
-//    }
-//    val t1 = System.currentTimeMillis()
-//    println("Elapsed time: " + (t1 - t0) + "ns")
-//
-//  }
-//
-//  def addEdge(session: OrientGraph, myClass: String, from: OrientVertex, to: OrientVertex)(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)) {
-//    session.addEdge(s"class:$myClass", from, to, null)
-//  }
 
   /**
    * Defines the [[com.orientechnologies.orient.core.metadata.schema.OClass]] parameter nature

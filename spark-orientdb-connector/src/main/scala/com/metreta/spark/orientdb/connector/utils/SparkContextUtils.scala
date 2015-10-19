@@ -41,6 +41,7 @@ object SparkContextUtils {
   val defaultSparkConf = new SparkConf(true)
     .setMaster("local[*]")
     .setAppName("Test")
+    .set("spark.orientdb.clustermode", "remote")
     .set("spark.orientdb.connection.nodes", "127.0.0.1")
     .set("spark.orientdb.port", "2424")
     .set("spark.orientdb.protocol", protocol)

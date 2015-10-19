@@ -16,9 +16,15 @@ import com.orientechnologies.orient.core.exception.OTransactionException
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException
 import scala.util.control.Breaks._
 import org.apache.spark.SparkContext._
+import com.orientechnologies.orient.core.sql.OCommandSQL
+import java.text.SimpleDateFormat
+import org.apache.commons.codec.binary.Base64
+import com.orientechnologies.orient.server.distributed.task.ODistributedRecordLockedException
+import com.tinkerpop.blueprints.impls.orient.OrientVertex
 
 /** Provides OrientDB graph-oriented function on [[org.apache.spark.graphx.Graph]] */
 class GraphFunctions[V, E](graph: Graph[V, E]) extends Serializable with Logging {
+
   /**
    * Converts the instance of [[org.apache.spark.graphx.Graph]] to a [[com.tinkerpop.blueprints.impls.orient.OrientGraph]] instance
    * and saves it into the Orient Database defined in the [[org.apache.spark.SparkContext]].
@@ -74,6 +80,103 @@ class GraphFunctions[V, E](graph: Graph[V, E]) extends Serializable with Logging
   }
 
   /**
+   * Converts the instance of [[org.apache.spark.graphx.Graph]] to a [[com.tinkerpop.blueprints.impls.orient.OrientGraph]] instance
+   * and upserts it into the Orient Database defined in the [[org.apache.spark.SparkContext]].
+   */
+
+  def upsertGraphToOrient()(implicit connector: OrientDBConnector = OrientDBConnector(graph.vertices.sparkContext.getConf)): Unit = {
+
+    val vertexPlaceholder = "${vertex}"
+    val wherePlaceholder = "${prop}"
+    val classPlaceholder = "${class}"
+    val fromPlaceholder = "${from}"
+    val toPlaceholder = "${to}"
+    val selectRid = "SELECT FLATTEN(@rid) FROM " + vertexPlaceholder + " WHERE " + wherePlaceholder + " = "
+    val createEdge = "CREATE EDGE " + classPlaceholder + " FROM " + fromPlaceholder + " TO " + toPlaceholder
+
+    graph.vertices
+      .foreachPartition(part => {
+        part.foreach {
+          case v =>
+            if (v._2 != null) {
+
+              val fromFirstField = v._2.getClass().getDeclaredFields.apply(0)
+              fromFirstField.setAccessible(true)
+
+              val fromQuery = "UPDATE " + getObjClass(v._2) + "  " + getInsertString(v._2) +
+                " upsert return after @rid where " + fromFirstField.getName + " = " + fromFirstField.get(v._2)
+              val session = connector.databaseDocumentTx()
+              try {
+                session.command(new OCommandSQL(fromQuery)).execute().asInstanceOf[java.util.ArrayList[Any]]
+                session.commit()
+
+              } catch {
+                case e: Exception => {
+                  println("exception")
+                  session.rollback()
+                  e.printStackTrace()
+                }
+              } finally {
+                session.release()
+                session.close()
+              }
+            } else {
+              println("cannot create vertex")
+            }
+        }
+
+      })
+
+    graph.edges
+      .foreachPartition(part => {
+        part.foreach {
+          case edge =>
+            val session = connector.databaseDocumentTx()
+            val attr = toMap(edge.attr)
+            val to = edge.dstId.toLong
+            val from = edge.srcId.toLong
+
+            val fromQuery = selectRid
+              .replace(vertexPlaceholder, attr.get("classFrom").toString)
+              .replace(wherePlaceholder, attr.get("propFrom").toString)
+            val fromOrid = session.command(new OCommandSQL(fromQuery + from)).execute().asInstanceOf[java.util.ArrayList[Any]]
+
+            val toQuery = selectRid
+              .replace(vertexPlaceholder, attr.get("classTo").toString)
+              .replace(wherePlaceholder, attr.get("propTo").toString)
+            val toOrid = session.command(new OCommandSQL(toQuery + to)).execute().asInstanceOf[java.util.ArrayList[Any]]
+
+            if (fromOrid != null && !fromOrid.isEmpty() && toOrid != null && !toOrid.isEmpty()) {
+
+              val edgeQuery = createEdge
+                .replace(classPlaceholder, attr.get("myClass").toString)
+                .replace(fromPlaceholder, fromOrid.get(0).toString)
+                .replace(toPlaceholder, toOrid.get(0).toString)
+
+              var retry = true
+              var n = 100
+              while (retry && n > 0) {
+                n = n - 1
+                try {
+                  val edge_orid = session.command(new OCommandSQL(edgeQuery)).execute().asInstanceOf[java.util.ArrayList[Any]]
+                  session.commit()
+                  retry = false
+                  session.release()
+                  session.close()
+                } catch {
+                  case e: Exception => {
+                    session.rollback()
+                  }
+                }
+              }
+            } else {
+              println("cannot create edge from: " + from + " to " + to)
+            }
+        }
+      })
+  }
+
+  /**
    * Converts an instance of a case class to a Map[String, Object]
    * of its fields and fields values
    * @param myOb an object
@@ -106,6 +209,55 @@ class GraphFunctions[V, E](graph: Graph[V, E]) extends Serializable with Logging
     } else {
       myOb.getClass().getSimpleName
     }
+  }
+
+  /**
+   * Converts an instance of a case class to a string which will
+   * be utilized for SQL INSERT command composition.
+   *
+   * Example:
+   * given a case class Person(name: String, surname: String)
+   *
+   * getInsertString(Person("Larry", "Page")) will return a String: " name = 'Larry', surname = 'Page'"
+   *
+   * @param orientClass used to obtain the fields types
+   * @param obj an object
+   * @return a string
+   */
+  private def getInsertString[T](obj: T): String = {
+
+    var insStr = "SET"
+
+    obj match {
+      case o: Int            => insStr = insStr + " value = " + o + ","
+      case o: Boolean        => insStr = insStr + " value = " + o + ","
+      case o: BigDecimal     => insStr = insStr + " value = " + o + ","
+      case o: Float          => insStr = insStr + " value = " + o + ","
+      case o: Double         => insStr = insStr + " value = " + o + ","
+      case o: java.util.Date => insStr = insStr + " value = date('" + orientDateFormat.format(o) + "'),"
+      case o: Short          => insStr = insStr + " value = " + o + ","
+      case o: Long           => insStr = insStr + " value = " + o + ","
+      case o: String         => insStr = insStr + " value = '" + o + "',"
+      case o: Array[Byte]    => insStr = insStr + " value = '" + Base64.encodeBase64String(o.asInstanceOf[Array[Byte]]) + "',"
+      case o: Byte           => insStr = insStr + " value = " + o + ","
+      case _ => {
+        obj.getClass().getDeclaredFields.foreach {
+          case field =>
+            field.setAccessible(true)
+            insStr = insStr + " " + field.getName + " = " + buildValueByType(field.get(obj)) + ","
+        }
+      }
+    }
+    insStr.dropRight(1)
+  }
+
+  private val orientDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+  private def buildValueByType(fieldValue: AnyRef): String = fieldValue match {
+    case _: Array[Byte]      => "'" + Base64.encodeBase64String(fieldValue.asInstanceOf[Array[Byte]]) + "'" //"'" + (fieldValue.asInstanceOf[Array[Byte]]) + "'"//
+    case _: java.lang.String => "'" + fieldValue + "'"
+    case _: java.util.Date   => "date('" + orientDateFormat.format(fieldValue) + "')"
+    case _                   => fieldValue.toString()
   }
 
 }
