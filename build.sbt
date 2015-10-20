@@ -11,10 +11,6 @@ lazy val commonSettings = Seq(
     "org.scalatest" % "scalatest_2.11" % "2.2.4",
     "org.apache.spark" % "spark-core_2.11" % "1.4.0",
     "org.apache.spark" % "spark-graphx_2.11" % "1.4.0",
-    "org.apache.spark" % "spark-unsafe_2.11" % "1.4.0",
-    "org.apache.spark" % "spark-network-common_2.11" % "1.4.0",
-    "org.apache.spark" % "spark-network-shuffle_2.11" % "1.4.0",
-    "org.apache.spark" % "spark-launcher_2.11" % "1.4.0",
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.6.0"
     ),
     externalResolvers := Seq(DefaultMavenRepository),

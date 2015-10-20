@@ -19,7 +19,6 @@ import org.apache.spark.SparkContext._
 import com.orientechnologies.orient.core.sql.OCommandSQL
 import java.text.SimpleDateFormat
 import org.apache.commons.codec.binary.Base64
-import com.orientechnologies.orient.server.distributed.task.ODistributedRecordLockedException
 import com.tinkerpop.blueprints.impls.orient.OrientVertex
 
 /** Provides OrientDB graph-oriented function on [[org.apache.spark.graphx.Graph]] */
