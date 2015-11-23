@@ -1,20 +1,20 @@
+val sparkVersion = "1.5.1"
+val orientVersion = "2.1.5"
+
 lazy val commonSettings = Seq(
   organization := "com.metreta",
-  version := "brench-master",
-  scalaVersion := "2.10.4",
+  version := "1.0",
+  scalaVersion := "2.11.7",
   fork:= true,
   libraryDependencies ++= Seq(
-    "com.orientechnologies" % "orientdb-core" % "2.1.2",
-    "com.orientechnologies" % "orientdb-client" % "2.1.2",
-    "com.orientechnologies" % "orientdb-jdbc" % "2.1.2",
-    "com.orientechnologies" % "orientdb-graphdb" % "2.1.2",
-    "com.orientechnologies" % "orientdb-distributed" % "2.1.2",
-    "org.scalatest" % "scalatest_2.10" % "2.2.4",
-    "org.apache.spark" % "spark-core_2.10" % "1.4.0",
-    "org.apache.spark" % "spark-graphx_2.10" % "1.4.0",
+    "com.orientechnologies" % "orientdb-client" % orientVersion,
+    "com.orientechnologies" % "orientdb-graphdb" % orientVersion,
+    "org.scalatest" %% "scalatest" % "2.2.4",
+    "org.apache.spark" %% "spark-core" % sparkVersion % Provided,
+    "org.apache.spark" %% "spark-graphx" % sparkVersion % Provided,
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.6.0"
     ),
-    externalResolvers := Seq(DefaultMavenRepository),
+    externalResolvers ++= Seq(DefaultMavenRepository),
     parallelExecution in Test := false
 )
 
