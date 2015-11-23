@@ -47,7 +47,7 @@ class ODocumentRDDSpec extends BaseOrientDbFlatSpec {
   }
 
   "A ODocumentRDD" should "allow to read an Orient Class as Array of ODocument" in {
-    val oDocuments = sparkContext.oDocumentQuery("class_test").collect()
+    val oDocuments = sparkContext.orientDocumentQuery("class_test").collect()
     oDocuments should have length NumInsertLoop
     val result = OrientDocument.fromODocument(oDocuments.head)
     result.getString("string_field_1") should startWith("text")

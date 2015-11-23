@@ -1,10 +1,20 @@
 val sparkVersion = "1.5.1"
 val orientVersion = "2.1.5"
 
+val crossScala = Seq("2.11.7", "2.10.5")
+
+/* Leverages optional Spark 'scala-2.11' profile optionally set by the user via -Dscala-2.11=true if enabled */
+lazy val scalaVer = sys.props.get("scala-2.11") match {
+  case Some(is) if is.nonEmpty && is.toBoolean => crossScala.head
+  case crossBuildFor                           => crossScala.last
+}
+
 lazy val commonSettings = Seq(
   organization := "com.metreta",
-  version := "1.0",
-  scalaVersion := "2.11.7",
+  version := "1.5.0-SNAPSHOT",
+  scalaVersion := scalaVer,
+  crossScalaVersions := crossScala,
+  crossVersion := CrossVersion.binary,
   fork:= true,
   libraryDependencies ++= Seq(
     "com.orientechnologies" % "orientdb-client" % orientVersion,
