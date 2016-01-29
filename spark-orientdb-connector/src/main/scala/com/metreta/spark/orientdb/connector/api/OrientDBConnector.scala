@@ -3,26 +3,14 @@
 
 package com.metreta.spark.orientdb.connector.api
 
-import org.apache.spark.Logging
-import org.apache.spark.SparkConf
+import com.orientechnologies.orient.core.command.OCommandRequest
+import com.orientechnologies.orient.core.config.OGlobalConfiguration
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePool
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
 import com.orientechnologies.orient.core.sql.OCommandSQL
-import com.orientechnologies.orient.core.sql.query.OResultSet
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery
-import com.tinkerpop.blueprints.impls.orient.OrientGraph
-import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx
-import com.orientechnologies.common.io.OIOException
-import java.sql.DriverManager
-import java.util.Properties
-import com.orientechnologies.orient.jdbc.OrientJdbcConnection
-import com.orientechnologies.orient.client.remote.OServerAdmin
-import com.orientechnologies.orient.core.exception.OStorageException
-import com.orientechnologies.orient.core.sql.query.OSQLAsynchQuery
-import com.orientechnologies.orient.core.config.OGlobalConfiguration
-import com.sun.org.apache.bcel.internal.generic.RET
-import com.orientechnologies.orient.core.command.OCommandRequest
-import com.orientechnologies.orient.core.db.ODatabaseFactory
+import com.orientechnologies.orient.core.sql.query.{ OResultSet, OSQLSynchQuery }
+import com.tinkerpop.blueprints.impls.orient.{ OrientGraph, OrientGraphNoTx }
+import org.apache.spark.{ Logging, SparkConf }
 
 /**
  * This is the connection manager, all OrientDB operations must be executed within this class.
@@ -172,10 +160,10 @@ class OrientDBConnector(conf: OrientDBConnectorConf)
    */
   def databaseDocumentTx(): ODatabaseDocumentTx = {
      if (clusterMode)
-        new ODatabaseDocumentTx(connStringLocalhost).open(user, pass) 
-     else    
-      new ODatabaseDocumentTx(connProtocol + ":" + connNodes.toList((math.random * connNodes.size).toInt).getHostAddress + ":" + connPort + "/" + connDbname).open(user, pass) 
-    
+        new ODatabaseDocumentTx(connStringLocalhost).open(user, pass)
+     else
+      new ODatabaseDocumentTx(connProtocol + ":" + connNodes.toList((math.random * connNodes.size).toInt).getHostAddress + ":" + connPort + "/" + connDbname).open(user, pass)
+
   }
 
   /**
