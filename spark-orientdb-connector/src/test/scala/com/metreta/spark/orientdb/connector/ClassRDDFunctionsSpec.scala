@@ -246,6 +246,7 @@ class ClassJsonRDDFunctionsSpec extends BaseOrientDbFlatSpec {
       v.field("intField").asInstanceOf[Int] should (be(28) or be(32))
       val friends = v.field("arrayField").asInstanceOf[OTrackedList[Object]]
       val firstFriend = friends.get(0).asInstanceOf[OTrackedMap[Object]]
+      firstFriend.get("id").asInstanceOf[Int] shouldBe 0
       firstFriend.get("name").asInstanceOf[String] should (be ("Maggie Ray") or be ("Arnold Roman"))
     }
   }
