@@ -11,8 +11,8 @@ lazy val scalaVer = sys.props.get("scala-2.11") match {
 }
 
 lazy val commonSettings = Seq(
-  organization := "com.metreta",
   /* Spring specific Stuff */
+  organization := "springnz",
 //  version := "1.5.0-SNAPSHOT", Replaced with version.sbt
   publishTo := {
     if (isSnapshot.value)
