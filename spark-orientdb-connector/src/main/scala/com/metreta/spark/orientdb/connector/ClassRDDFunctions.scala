@@ -18,6 +18,32 @@ import java.math.BigDecimal
 import com.orientechnologies.orient.core.record.impl.ODocument
 import org.apache.spark.TaskContext
 
+class ClassJsonRDDFunctions(rdd: RDD[String]) extends Serializable with Logging {
+  /**
+    * Saves an instance of [[org.apache.spark.rdd.RDD RDD]] into an OrientDB class.
+    * @param myClass the OrientDB class to save in
+    */
+  /*
+	 * Prerequisites:
+	 *  -> Input class must have been created on OrientDB
+	 *  -> rdd must be composed of strings in Json format
+	 */ def saveJsonToOrient(myClass: String)(implicit connector: OrientDBConnector = OrientDBConnector(rdd.sparkContext.getConf)): Unit = {
+    rdd.foreachPartition { partition ⇒
+      val db = connector.databaseDocumentTx()
+
+      while (partition.hasNext) {
+        val obj = partition.next()
+        val doc = new ODocument(myClass);
+        doc.fromJSON(obj)
+        db.save(doc)
+
+      }
+      db.commit()
+      db.close()
+    }
+  }
+}
+
 class ClassRDDFunctions[T](rdd: RDD[T]) extends Serializable with Logging {
   /**
    * Saves an instance of [[org.apache.spark.rdd.RDD RDD]] into an OrientDB class.
