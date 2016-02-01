@@ -1,5 +1,6 @@
 val sparkVersion = "1.5.1"
 val orientVersion = "2.1.5"
+val repo = "https://nexus.prod.corp/content"
 
 val crossScala = Seq("2.11.7", "2.10.5")
 
@@ -11,7 +12,15 @@ lazy val scalaVer = sys.props.get("scala-2.11") match {
 
 lazy val commonSettings = Seq(
   organization := "com.metreta",
-  version := "1.5.0-SNAPSHOT",
+  /* Spring specific Stuff */
+//  version := "1.5.0-SNAPSHOT", Replaced with version.sbt
+  publishTo := {
+    if (isSnapshot.value)
+      Some("snapshots" at s"$repo/repositories/snapshots")
+    else
+      Some("releases" at s"$repo/repositories/releases")
+  },
+  /* End Spring specific Stuff */
   scalaVersion := scalaVer,
   crossScalaVersions := crossScala,
   crossVersion := CrossVersion.binary,
@@ -40,3 +49,12 @@ lazy val demos = (project in file("./spark-orientdb-connector-demos")).
     name := "spark-orientdb-connector-demos"
     ).
    dependsOn(connector)
+
+lazy val main = (project in file("."))
+  .aggregate(connector, demos)
+  .settings(Defaults.coreDefaultSettings ++ Seq(
+    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo"))),
+    publishArtifact := false
+  ))
+  .settings(parallelExecution in Test := false)
+
