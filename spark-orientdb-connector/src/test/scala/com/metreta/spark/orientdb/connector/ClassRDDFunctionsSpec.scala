@@ -7,6 +7,8 @@ import java.math.BigDecimal
 import java.nio.charset.StandardCharsets
 import java.util.Calendar
 import java.util.Date
+import com.orientechnologies.orient.core.db.record.{OTrackedMap, OTrackedList}
+
 import scala.Vector
 import scala.collection.JavaConversions.asScalaIterator
 import org.apache.spark.rdd.RDD
@@ -241,10 +243,10 @@ class ClassJsonRDDFunctionsSpec extends BaseOrientDbFlatSpec {
     for (v <- vecRes) {
       v.field("guid").asInstanceOf[String] should
         (be("18026e8b-5382-45b4-bac0-835ddaf4ca12") or be("d458ba2a-f813-42ee-a647-b65fee9af4ee"))
-      v.field("infField").asInstanceOf[Int] should (be(28) or be(32))
-      val arrayField = v.field("arrayField")
-      val a = arrayField
-
+      v.field("intField").asInstanceOf[Int] should (be(28) or be(32))
+      val friends = v.field("arrayField").asInstanceOf[OTrackedList[Object]]
+      val firstFriend = friends.get(0).asInstanceOf[OTrackedMap[Object]]
+      firstFriend.get("name").asInstanceOf[String] should (be ("Maggie Ray") or be ("Arnold Roman"))
     }
   }
 
