@@ -24,7 +24,10 @@ package object connector {
   
   implicit def toRDDFunctions[T](rdd: RDD[T]): ClassRDDFunctions[T] =
     new ClassRDDFunctions(rdd)
-  
+
+  implicit def toJsonRDDFunctions(rdd: RDD[String]): ClassJsonRDDFunctions =
+    new ClassJsonRDDFunctions(rdd)
+
   implicit def toGraphxFunctions[V,E](graph: Graph[V, E]): GraphFunctions[V, E] =
     new GraphFunctions(graph)
 

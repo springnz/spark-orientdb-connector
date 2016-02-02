@@ -30,3 +30,4 @@ spark-orientdb-connector/.gitignore
 .idea/
 *.iml
 *.iws
+
