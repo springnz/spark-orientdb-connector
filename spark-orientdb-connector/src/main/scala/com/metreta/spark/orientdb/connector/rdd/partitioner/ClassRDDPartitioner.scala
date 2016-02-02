@@ -17,18 +17,18 @@ import com.metreta.spark.orientdb.connector.SystemTables
 import scala.collection.JavaConversions.iterableAsScalaIterable
 
 /**
- * @author Simone Bronzin
- */
+  * @author Simone Bronzin
+  */
 class ClassRDDPartitioner(
-  connector: OrientDBConnector,
-  mClass: String) extends Logging {
+    connector: OrientDBConnector,
+    mClass: String) extends Logging {
 
   /**
-   * @return Spark partitions from a given OrientdDB class.
-   */
+    * @return Spark partitions from a given OrientdDB class.
+    */
   def getPartitions(): Array[Partition] = {
-    
-	val db = connector.databaseDocumentTx()
+
+    val db = connector.databaseDocumentTx()
 
     var partitions = new ArrayBuffer[OrientPartition]
     val schema: OSchema = connector.getSchema(db)
@@ -39,12 +39,12 @@ class ClassRDDPartitioner(
     // val nodesHost = delegateFieldValues.asInstanceOf[OTrackedList[ODocument]].map(z => (z.rawField("name"), z.rawField("listeners").asInstanceOf[OTrackedList[OTrackedMap[ODocument]]].get(0).get("listen")))
     //println("cluster selection: " + klass.getClusterSelection.getName)
     klass.getClusterIds.zipWithIndex foreach {
-      case (clusterId, index) => partitions = partitions.+=(OrientPartition(
+      case (clusterId, index) ⇒ partitions = partitions.+=(OrientPartition(
         index,
         null, // <- Host Address ?????
         PartitionName(klass.getName, storage.getClusterById(clusterId).getName)))
     }
-  partitions.toArray
+    partitions.toArray
   }
 
 }

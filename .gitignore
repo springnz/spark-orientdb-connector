@@ -25,3 +25,8 @@ project/plugins/project/
 /.cache-tests
 spark-orientdb-connector-demos/.settings
 spark-orientdb-connector/.gitignore
+
+# Intellij
+.idea/
+*.iml
+*.iws

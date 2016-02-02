@@ -1,4 +1,4 @@
-# Spark OrientDB Connector 
+# Spark OrientDB Connector
 
 This library allows you to:
 
@@ -35,28 +35,31 @@ Then build the connector with sbt:
 	sbt package
 ```
 
+The default behaviour is to build for Scala 2.10. To build for Scala 2.11, execute the following instead
+
+```shell
+	sbt -Dscala-2.11=true package
+```
+
 ### Create an sbt project and add dependencies
 
 Create a basic Spark sbt project, add the connector jar you just built to the /lib folder and then add the following dependencies to your build.sbt:
 
 ```scala
   libraryDependencies ++= Seq(
-    "com.orientechnologies" % "orientdb-core" % "2.1.0",
     "com.orientechnologies" % "orientdb-client" % "2.1.0",
-    "org.apache.spark" % "spark-core_2.11" % "1.4.0",
-    "org.apache.spark" % "spark-graphx_2.11" % "1.4.0",
     "com.tinkerpop.blueprints" % "blueprints-core" % "2.6.0",
-    "com.orientechnologies" % "orientdb-graphdb" % "2.1.0",
-    "com.orientechnologies" % "orientdb-distributed" % "2.1.0"
+    "org.apache.spark" %% "spark-core" % "1.5.1",
+    "org.apache.spark" %% "spark-graphx" % "1.5.1"
     )
 ```
-    
+
 Don't forget to choose the appropriate library versions as listed in the [version list](docs/version_list.md).
 
 
-### Set up example data in OrientDB 
+### Set up example data in OrientDB
 
-Define a class Person in your OrientDB instance: 
+Define a class Person in your OrientDB instance:
 
 ```sql
 CREATE CLASS Person EXTENDS V
@@ -72,7 +75,7 @@ CREATE VERTEX Person SET name = 'Mary', surname = 'Smith'
 CREATE VERTEX Person SET name = 'Frank', surname = 'White'
 CREATE VERTEX Person SET name = 'Lois', surname = 'Parker'
 
-CREATE EDGE Friendship FROM (SELECT FROM Person WHERE name = 'John' and surname = 'Doe') TO (SELECT FROM Person WHERE name = 'Mary' and surname = 'Smith') 
+CREATE EDGE Friendship FROM (SELECT FROM Person WHERE name = 'John' and surname = 'Doe') TO (SELECT FROM Person WHERE name = 'Mary' and surname = 'Smith')
 CREATE EDGE Friendship FROM (SELECT FROM Person WHERE name = 'John' and surname = 'Doe') TO (SELECT FROM Person WHERE name = 'Frank' and surname = 'White')
 CREATE EDGE Friendship FROM (SELECT FROM Person WHERE name = 'Frank' and surname = 'White') TO (SELECT FROM Person WHERE name = 'Lois' and surname = 'Parker')
 ```
@@ -94,7 +97,7 @@ object Demo extends App{
 
 ```
 
- 
+
 ### Configure Spark context
 
 Create a Spark configuration object and set OrientDB connector specific parameters  :
@@ -104,15 +107,15 @@ val conf = new SparkConf()
     .setMaster("local[*]")
     .setAppName("OrientDBConnectorTest")
     .set("spark.orientdb.clustermode", "remote")
-    .set("spark.orientdb.connection.nodes", "x.x.x.x, y.y.y.y, z.z.z.z") 
-    .set("spark.orientdb.protocol", "remote") 
+    .set("spark.orientdb.connection.nodes", "x.x.x.x, y.y.y.y, z.z.z.z")
+    .set("spark.orientdb.protocol", "remote")
     .set("spark.orientdb.dbname", "connector-test")
     .set("spark.orientdb.port", "2424")
     .set("spark.orientdb.user", "root")
     .set("spark.orientdb.password", "pAzzw0rd")
 ```
 
-Now create a SparkContext: 
+Now create a SparkContext:
 
 ```scala
 val sc = new SparkContext(conf)
@@ -131,7 +134,11 @@ Use the function `orientQuery` to get an RDD containing all the entries of an Or
  	val rddPeople = sc.orientQuery("Person")
 ```
 
-`rddPeople` is an object of OrientClassRDD type containing  all the entries from the `Person` class as OrientDocument objects. 
+`rddPeople` is an object of OrientClassRDD type containing  all the entries from the `Person` class as OrientDocument objects, created from the raw ODocument objects. If you prefer to get the ODocuments instead, use the following function:
+
+```scala
+ 	val rddPeople = sc.orientDocumentQuery("Person")
+```
 
 The function `saveToOrient` writes an RDD of case objects to an OrientDB class:
 
@@ -144,7 +151,6 @@ To get a GraphX graph object from an OrientDB database use the `orientGraph` fun
 ```scala
 	val graphPeople = sc.orientGraph()
 ```
-
 
 
 ## License
