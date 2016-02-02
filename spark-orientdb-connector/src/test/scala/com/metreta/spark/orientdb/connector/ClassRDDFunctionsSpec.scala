@@ -4,12 +4,12 @@
 package com.metreta.spark.orientdb.connector
 
 import java.math.BigDecimal
-import java.util.{Calendar, Date}
+import java.util.{ Calendar, Date }
 
 import com.metreta.spark.orientdb.connector.api.OrientDBConnector
 import com.metreta.spark.orientdb.connector.utils.BaseOrientDbFlatSpec
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
-import com.orientechnologies.orient.core.metadata.schema.{OClass, OProperty, OSchema, OType}
+import com.orientechnologies.orient.core.metadata.schema.{ OClass, OProperty, OSchema, OType }
 import org.apache.spark.rdd.RDD
 
 import scala.Vector
@@ -45,7 +45,7 @@ case class ClassInsTest(
   string_field: String)
 
 class ClassRDDFunctionsSpec extends BaseOrientDbFlatSpec {
-  
+
   val dbname = "/tmp/databases/test/ClassRDDFunctionsSpec"
 
   val calendarDateTime = Calendar.getInstance()
@@ -59,7 +59,7 @@ class ClassRDDFunctionsSpec extends BaseOrientDbFlatSpec {
   var database: ODatabaseDocumentTx = null
 
   //sparkContext.orientQuery("class_ins_test").foreach(println)
-  
+
   override def beforeAll(): Unit = {
     defaultSparkConf.set("spark.orientdb.dbname", dbname)
     initSparkConf(defaultSparkConf)
@@ -88,7 +88,7 @@ class ClassRDDFunctionsSpec extends BaseOrientDbFlatSpec {
     val result = database.browseClass("class_ins_test")
     val vecRes = Vector() ++ result.iterator()
 
-    for (v <- vecRes) {
+    for (v ← vecRes) {
 
       v.field("byte_field").asInstanceOf[Byte] should be(1.toByte)
       v.field("binary_field").asInstanceOf[Array[Byte]] should be("binaryData".getBytes())
@@ -119,7 +119,7 @@ class ClassRDDFunctionsSpec extends BaseOrientDbFlatSpec {
     val result = database.browseClass("class_ins_test_no_def")
     val vecRes = Vector() ++ result.iterator()
 
-    for (v <- vecRes) {
+    for (v ← vecRes) {
 
       v.field("byte_field").asInstanceOf[Byte] should be(1.toByte)
       v.field("binary_field").asInstanceOf[Array[Byte]] should be("binaryData".getBytes())
@@ -197,5 +197,4 @@ class ClassRDDFunctionsSpec extends BaseOrientDbFlatSpec {
   }
 
 }
-
 

@@ -3,8 +3,8 @@ package com.metreta.spark.orientdb.connector
 import com.metreta.spark.orientdb.connector.api.OrientDBConnector
 import com.metreta.spark.orientdb.connector.utils.BaseOrientDbFlatSpec
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
-import com.orientechnologies.orient.core.db.record.{OTrackedList, OTrackedMap}
-import com.orientechnologies.orient.core.metadata.schema.{OClass, OSchema}
+import com.orientechnologies.orient.core.db.record.{ OTrackedList, OTrackedMap }
+import com.orientechnologies.orient.core.metadata.schema.{ OClass, OSchema }
 import org.apache.spark.rdd.RDD
 
 import scala.Vector
@@ -35,14 +35,14 @@ class ClassJsonRDDFunctionsSpec extends BaseOrientDbFlatSpec {
     val result = database.browseClass("class_json_ins_test")
     val vecRes = Vector() ++ result.iterator()
 
-    for (v <- vecRes) {
+    for (v ← vecRes) {
       v.field("guid").asInstanceOf[String] should
         (be("18026e8b-5382-45b4-bac0-835ddaf4ca12") or be("d458ba2a-f813-42ee-a647-b65fee9af4ee"))
       v.field("intField").asInstanceOf[Int] should (be(28) or be(32))
       val friends = v.field("arrayField").asInstanceOf[OTrackedList[Object]]
       val firstFriend = friends.get(0).asInstanceOf[OTrackedMap[Object]]
       firstFriend.get("id").asInstanceOf[Int] shouldBe 0
-      firstFriend.get("name").asInstanceOf[String] should (be ("Maggie Ray") or be ("Arnold Roman"))
+      firstFriend.get("name").asInstanceOf[String] should (be("Maggie Ray") or be("Arnold Roman"))
     }
   }
 

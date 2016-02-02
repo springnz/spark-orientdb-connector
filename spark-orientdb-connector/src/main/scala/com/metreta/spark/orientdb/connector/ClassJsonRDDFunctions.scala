@@ -14,7 +14,8 @@ class ClassJsonRDDFunctions(rdd: RDD[String]) extends Serializable with Logging 
 	 * Prerequisites:
 	 *  -> Input class must have been created on OrientDB
 	 *  -> rdd must be composed of strings in Json format
-	 */ def saveJsonToOrient(myClass: String)(implicit connector: OrientDBConnector = OrientDBConnector(rdd.sparkContext.getConf)): Unit = {
+	 */
+  def saveJsonToOrient(myClass: String)(implicit connector: OrientDBConnector = OrientDBConnector(rdd.sparkContext.getConf)): Unit = {
     rdd.foreachPartition { partition ⇒
       val db = connector.databaseDocumentTx()
 
