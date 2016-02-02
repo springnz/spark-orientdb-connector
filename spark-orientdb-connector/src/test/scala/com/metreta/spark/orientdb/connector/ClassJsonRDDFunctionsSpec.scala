@@ -22,7 +22,6 @@ class ClassJsonRDDFunctionsSpec extends BaseOrientDbFlatSpec {
     initSparkConf(defaultSparkConf)
     rddTest = createRDD
     database = createDB
-    rddTest.saveJsonToOrient("class_json_ins_test")
   }
 
   override def afterAll(): Unit = {
@@ -30,6 +29,8 @@ class ClassJsonRDDFunctionsSpec extends BaseOrientDbFlatSpec {
   }
 
   "A spark RDD " should " allow to write a case class RDD to Orient Class on Orient with all fields defined " in {
+
+    rddTest.saveJsonToOrient("class_json_ins_test")
 
     val result = database.browseClass("class_json_ins_test")
     val vecRes = Vector() ++ result.iterator()
