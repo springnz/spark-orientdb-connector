@@ -1,7 +1,5 @@
 package com.metreta.spark.orientdb.connector
 
-import java.util.Calendar
-
 import com.metreta.spark.orientdb.connector.api.OrientDBConnector
 import com.metreta.spark.orientdb.connector.utils.BaseOrientDbFlatSpec
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
@@ -16,26 +14,14 @@ class ClassJsonRDDFunctionsSpec extends BaseOrientDbFlatSpec {
 
   val dbname = "/tmp/databases/test/ClassJsonRDDFunctionsSpec"
 
-  val calendarDateTime = Calendar.getInstance()
-  val calendarDate = calendarDateTime
-  calendarDate.set(Calendar.HOUR_OF_DAY, 0)
-  calendarDate.set(Calendar.MINUTE, 0)
-  calendarDate.set(Calendar.SECOND, 0)
-  calendarDate.set(Calendar.MILLISECOND, 0)
-
   var rddTest: RDD[String] = null
   var database: ODatabaseDocumentTx = null
-
-  //sparkContext.orientQuery("class_ins_test").foreach(println)
 
   override def beforeAll(): Unit = {
     defaultSparkConf.set("spark.orientdb.dbname", dbname)
     initSparkConf(defaultSparkConf)
-
     rddTest = createRDD
-
     database = createDB
-
     rddTest.saveJsonToOrient("class_json_ins_test")
   }
 
@@ -126,7 +112,7 @@ class ClassJsonRDDFunctionsSpec extends BaseOrientDbFlatSpec {
                   |    ]
                   |  }
                   |""".stripMargin
-    //
+
     sparkContext.parallelize(List(json1, json2))
 
   }
