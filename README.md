@@ -35,10 +35,10 @@ Then build the connector with sbt:
 	sbt package
 ```
 
-The default behaviour is to build for Scala 2.10. To build for Scala 2.11, execute the following instead
+The default behaviour is to build for Scala 2.11. To build for Scala 2.10, execute the following instead
 
 ```shell
-	sbt -Dscala-2.11=true package
+	sbt -Dscala-2.10=true package
 ```
 
 ### Create an sbt project and add dependencies
