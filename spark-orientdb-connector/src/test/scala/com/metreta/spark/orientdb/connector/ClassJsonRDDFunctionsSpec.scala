@@ -20,7 +20,7 @@ class ClassJsonRDDFunctionsSpec extends BaseOrientDbFlatSpec {
   override def beforeAll(): Unit = {
     defaultSparkConf.set("spark.orientdb.dbname", dbname)
     initSparkConf(defaultSparkConf)
-    rddTest = createRDD
+    rddTest = createRDD()
     database = createDB
   }
 
