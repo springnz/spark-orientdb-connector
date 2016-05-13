@@ -8,9 +8,10 @@ import com.orientechnologies.orient.core.config.OGlobalConfiguration
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePool
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx
 import com.orientechnologies.orient.core.sql.OCommandSQL
-import com.orientechnologies.orient.core.sql.query.{ OResultSet, OSQLSynchQuery }
-import com.tinkerpop.blueprints.impls.orient.{ OrientGraph, OrientGraphNoTx }
-import org.apache.spark.{ Logging, SparkConf }
+import com.orientechnologies.orient.core.sql.query.{OResultSet, OSQLSynchQuery}
+import com.tinkerpop.blueprints.impls.orient.{OrientGraph, OrientGraphNoTx}
+import com.typesafe.config.Config
+import org.apache.spark.{Logging, SparkConf}
 
 /**
  * This is the connection manager, all OrientDB operations must be executed within this class.
@@ -222,5 +223,8 @@ object OrientDBConnector {
   def apply(conf: SparkConf): OrientDBConnector = {
     new OrientDBConnector(OrientDBConnectorConf(conf))
   }
+
+  def apply(config: Config): OrientDBConnector =
+    new OrientDBConnector(OrientDBConnectorConf(config))
 
 }

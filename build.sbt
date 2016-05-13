@@ -2,18 +2,17 @@ val sparkVersion = "1.5.1"
 val orientVersion = "2.1.5"
 val repo = "https://nexus.prod.corp/content"
 
-val crossScala = Seq("2.11.7", "2.10.5")
+val crossScala = Seq("2.11.8", "2.10.5")
 
-/* Leverages optional Spark 'scala-2.11' profile optionally set by the user via -Dscala-2.11=true if enabled */
-lazy val scalaVer = sys.props.get("scala-2.11") match {
-  case Some(is) if is.nonEmpty && is.toBoolean => crossScala.head
-  case crossBuildFor                           => crossScala.last
+/* Leverages optional Spark 'scala-2.10' profile optionally set by the user via -Dscala-2.10=true if enabled */
+lazy val scalaVer = sys.props.get("scala-2.10") match {
+  case Some(is) if is.nonEmpty && is.toBoolean => crossScala.last
+  case crossBuildFor                           => crossScala.head
 }
 
 lazy val commonSettings = Seq(
   /* Spring specific Stuff */
   organization := "springnz",
-//  version := "1.5.0-SNAPSHOT", Replaced with version.sbt
   publishTo := {
     if (isSnapshot.value)
       Some("snapshots" at s"$repo/repositories/snapshots")
