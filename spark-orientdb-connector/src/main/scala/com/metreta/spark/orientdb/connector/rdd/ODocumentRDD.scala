@@ -15,6 +15,7 @@ import scala.collection.JavaConversions._
 class ODocumentRDD private[connector] (@transient val sc: SparkContext,
   val connector: OrientDBConnector,
   val from: String,
+  val what: String = "",
   val where: String = "",
   val depth: Option[Int] = None,
   val query: String = "")
@@ -34,7 +35,7 @@ class ODocumentRDD private[connector] (@transient val sc: SparkContext,
 
     val cluster = partition.partitionName.clusterName
 
-    val queryString = createQueryString(cluster, where, depth) match {
+    val queryString = createQueryString(cluster, what, where, depth) match {
       case Some(i) ⇒ i
       case None ⇒
         throw OrientDocumentException("wrong number of parameters")
@@ -59,11 +60,11 @@ class ODocumentRDD private[connector] (@transient val sc: SparkContext,
     * @param depth
     * @return OrientDB query string.
     */
-  def createQueryString(cluster: String, where: String, depth: Option[Int]): Option[String] = {
+  def createQueryString(cluster: String, what: String, where: String, depth: Option[Int]): Option[String] = {
     if (where == "" && depth.isEmpty) {
-      Option("select from cluster:" + cluster)
+      Option(s"select $what from cluster:" + cluster)
     } else if (where != "" && depth.isEmpty) {
-      Option("select from cluster:" + cluster + " where " + where)
+      Option(s"select $what from cluster:" + cluster + " where " + where)
     } else if (where == "" && depth.isDefined) {
       Option("traverse * from cluster:" + cluster + " while $depth < " + depth.get)
     } else {

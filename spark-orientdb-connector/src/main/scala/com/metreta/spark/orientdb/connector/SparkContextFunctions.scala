@@ -30,8 +30,8 @@ class SparkContextFunctions(@transient val sc: SparkContext) extends Serializabl
   def orientQuery(from: String, where: String = "")(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)) =
     new OrientClassRDD[OrientDocument](sc, connector, from, where)
 
-  def orientDocumentQuery(from: String, where: String = "")(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)) =
-    new ODocumentRDD(sc, connector, from, where)
+  def orientDocumentQuery(from: String, what: String = "", where: String = "")(implicit connector: OrientDBConnector = OrientDBConnector(sc.getConf)) =
+    new ODocumentRDD(sc, connector, from, what, where)
 
   /**
     * Creates a [[org.apache.spark.graphx.Graph]] starting by traversing an orientDB class.
