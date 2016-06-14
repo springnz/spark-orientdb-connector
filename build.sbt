@@ -2,12 +2,12 @@ val sparkVersion = "1.5.1"
 val orientVersion = "2.1.5"
 val repo = "https://nexus.prod.corp/content"
 
-val crossScala = Seq("2.11.8", "2.10.5")
+val crossScala = Seq("2.10.5", "2.11.8")
 
 /* Leverages optional Spark 'scala-2.10' profile optionally set by the user via -Dscala-2.10=true if enabled */
 lazy val scalaVer = sys.props.get("scala-2.10") match {
-  case Some(is) if is.nonEmpty && is.toBoolean => crossScala.last
-  case crossBuildFor                           => crossScala.head
+  case Some(is) if is.nonEmpty && is.toBoolean => crossScala.head
+  case crossBuildFor                           => crossScala.last
 }
 
 lazy val commonSettings = Seq(

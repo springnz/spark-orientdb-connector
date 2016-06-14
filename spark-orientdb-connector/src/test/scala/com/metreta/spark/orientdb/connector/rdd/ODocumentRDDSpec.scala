@@ -64,6 +64,13 @@ class ODocumentRDDSpec extends BaseOrientDbFlatSpec {
     result.getAs[Short]("short_field") should be(3)
   }
 
+  "A ODocumentRDD" should "support SQL projection" in {
+    val oDocuments = sparkContext.orientDocumentQuery("class_test", what = "string_field_1").collect()
+    oDocuments should have length NumInsertLoop
+    val result = OrientDocument.fromODocument(oDocuments.head)
+    result.oColumnNames.toList shouldBe List("string_field_1")
+  }
+
   private def buildTestDb()(implicit connector: OrientDBConnector = OrientDBConnector(defaultSparkConf)) = {
 
     OGlobalConfiguration.INDEX_AUTO_LAZY_UPDATES.setValue(0) // Turn off cache
