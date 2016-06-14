@@ -4,12 +4,15 @@
 package com.metreta.spark.orientdb.connector.api
 
 import java.net.InetAddress
+
+import com.typesafe.config.Config
 import org.apache.spark.{ Logging, SparkConf }
+
 import scala.util.control.NonFatal
 
 /**
- * @author Simone
- */
+  * @author Simone
+  */
 case class OrientDBConnectorConf(
   nodes: Set[InetAddress],
   port: String,
@@ -36,24 +39,49 @@ object OrientDBConnectorConf extends Logging {
   val OriendtDBUserProperty = "spark.orientdb.user"
 
   val OriendtDBPasswordProperty = "spark.orientdb.password"
-  
+
   val OriendtDBClusterModeProperty = "spark.orientdb.clustermode" //remote-colocated
   val DefaultOriendtDBClusterModeProperty = false
 
-  def apply(conf: SparkConf): OrientDBConnectorConf = {
-    
-    val nodesProperty = conf.get(OrientDBNodesProperty, InetAddress.getLocalHost.getHostAddress)
+  def apply(sparkConf: SparkConf): OrientDBConnectorConf = {
+
+    val nodesProperty = sparkConf.get(OrientDBNodesProperty, InetAddress.getLocalHost.getHostAddress)
     val nodes = for {
-      nodeName <- nodesProperty.split(",").toSet[String]
-      nodeAddress <- getHost(nodeName)
+      nodeName ← nodesProperty.split(",").toSet[String]
+      nodeAddress ← getHost(nodeName)
     } yield nodeAddress
-    
-    val protocol = conf.get(OriendtDBProtocolProperty, DefaultOriendtDBProtocolProperty)
-    val dbname = conf.get(OriendtDBDBNameProperty, DefaultOriendtDBDBNameProperty)
-    val port = conf.get(OriendtDBPortProperty, DefaultOriendtDBPortProperty)
-    val user = conf.get(OriendtDBUserProperty)
-    val password = conf.get(OriendtDBPasswordProperty)
-    val clusterMode = if(conf.get(OriendtDBClusterModeProperty).equals("colocated")){true}else{false}
+
+    val protocol = sparkConf.get(OriendtDBProtocolProperty, DefaultOriendtDBProtocolProperty)
+    val dbname = sparkConf.get(OriendtDBDBNameProperty, DefaultOriendtDBDBNameProperty)
+    val port = sparkConf.get(OriendtDBPortProperty, DefaultOriendtDBPortProperty)
+    val user = sparkConf.get(OriendtDBUserProperty)
+    val password = sparkConf.get(OriendtDBPasswordProperty)
+    val clusterMode = sparkConf.get(OriendtDBClusterModeProperty).equals("colocated")
+
+    OrientDBConnectorConf(nodes, port, protocol, dbname, user, password, clusterMode)
+  }
+
+  def apply(config: Config): OrientDBConnectorConf = {
+
+    def getStringOrElse(path: String, default: String): String =
+      if (config.hasPath(path))
+        config.getString(path)
+      else
+        default
+
+    val nodesProperty = getStringOrElse(OrientDBNodesProperty, InetAddress.getLocalHost.getHostAddress)
+
+    val nodes = for {
+      nodeName ← nodesProperty.split(",").toSet[String]
+      nodeAddress ← getHost(nodeName)
+    } yield nodeAddress
+
+    val protocol = getStringOrElse(OriendtDBProtocolProperty, DefaultOriendtDBProtocolProperty)
+    val dbname = getStringOrElse(OriendtDBDBNameProperty, DefaultOriendtDBDBNameProperty)
+    val port = getStringOrElse(OriendtDBPortProperty, DefaultOriendtDBPortProperty)
+    val user = getStringOrElse(OriendtDBUserProperty, "")
+    val password = config.getString(OriendtDBPasswordProperty)
+    val clusterMode = config.getString(OriendtDBClusterModeProperty).equals("colocated")
 
     OrientDBConnectorConf(nodes, port, protocol, dbname, user, password, clusterMode)
   }
@@ -63,7 +91,7 @@ object OrientDBConnectorConf extends Logging {
       val host = InetAddress.getByName(hostName)
       Some(host)
     } catch {
-      case NonFatal(e) =>
+      case NonFatal(e) ⇒
         logError("Host " + hostName + " not found", e)
         None
     }
