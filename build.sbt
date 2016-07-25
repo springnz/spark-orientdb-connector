@@ -1,4 +1,4 @@
-val sparkVersion = "1.5.1"
+val sparkVersion = "1.6.2"
 val orientVersion = "2.1.5"
 val repo = "https://nexus.prod.corp/content"
 
